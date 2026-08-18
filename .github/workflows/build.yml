@@ -10,13 +10,11 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3 
 
-    - name: Maximize Build Disk Space
+    - name: Freeing Disk Space
       run: |
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /usr/local/lib/android
-        sudo rm -rf /opt/ghc
-        sudo rm -rf /usr/gettext
-        docker rmi $(docker images -q) 
+        sudo rm -rf /opt/ghc 
 
     - name: Install Build Dependencies
       run: |
@@ -30,17 +28,17 @@ jobs:
         git config --global user.email "yourmail@example.com"
         repo init -u https://github.com -b halium-9.0 --depth=1 
 
-    - name: Clone Galaxy A30s Source Code (Shallow)
+    - name: Clone Galaxy A30s Source Code
       run: |
         cd halium
-        git clone https://github.com -b lineage-16.0 --depth=1 device/samsung/exynos7885
-        git clone https://github.com -b lineage-16.0 --depth=1 kernel/samsung/exynos7885
-        git clone https://github.com -b lineage-16.0 --depth=1 hardware/samsung 
+        git clone https://github.com -b lineage-16.0 device/samsung/exynos7885
+        git clone https://github.com -b lineage-16.0 kernel/samsung/exynos7885
+        git clone https://github.com -b lineage-16.0 hardware/samsung 
 
     - name: Run Repository Sync
       run: |
         cd halium
-        repo sync -c -j$(nproc) --no-clone-bundle --no-tags --optimized-fetch --prune 
+        repo sync -c -j$(nproc) --no-clone-bundle --no-tags 
 
     - name: Build Halium Boot and System Image
       run: |
@@ -50,14 +48,10 @@ jobs:
         make halium-boot -j$(nproc)
         make systemimage -j$(nproc) 
 
-    - name: Upload Flashable Output
+    - name: Upload Output Artifacts
       uses: actions/upload-artifact@v3
       with:
         name: Ubuntu-Touch-Galaxy-A30s
         path: |
           halium/out/target/product/*/halium-boot.img
           halium/out/target/product/*/system.img
-
-
-
-
